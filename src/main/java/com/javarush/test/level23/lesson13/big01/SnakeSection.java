@@ -1,5 +1,7 @@
 package com.javarush.test.level23.lesson13.big01;
 
+import java.util.Objects;
+
 public class SnakeSection
 {
     private int x;
@@ -20,5 +22,19 @@ public class SnakeSection
     public int getY()
     {
         return y;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SnakeSection that = (SnakeSection) o;
+        return x == that.x &&
+                y == that.y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 }

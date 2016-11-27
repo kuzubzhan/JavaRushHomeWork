@@ -2,62 +2,107 @@ package com.javarush.test.level23.lesson13.big01;
 
 import java.util.ArrayList;
 
-public class Snake {
-    private ArrayList<SnakeSection> sections;
-    private boolean isAlive;
+/**
+ * Класс змея
+ */
+public class Snake
+{
+    //Направление движения змеи
     private SnakeDirection direction;
+    //Состояние - жива змея или нет.
+    private boolean isAlive;
+    //Список кусочков змеи.
+    private ArrayList<SnakeSection> sections = new ArrayList<SnakeSection>();
 
-    public Snake(int x, int y) {
-        sections = new ArrayList<>();
+    public Snake(int x, int y)
+    {
+        sections = new ArrayList<SnakeSection>();
         sections.add(new SnakeSection(x, y));
         isAlive = true;
     }
 
-    public ArrayList<SnakeSection> getSections() {
-        return sections;
-    }
-
-    public boolean isAlive() {
+    public boolean isAlive()
+    {
         return isAlive;
     }
 
-    public SnakeDirection getDirection() {
-        return direction;
-    }
-
-    public void setDirection(SnakeDirection direction) {
-        this.direction = direction;
-    }
-    public int getX() {
+    public int getX()
+    {
         return sections.get(0).getX();
     }
 
-    public int getY() {
+    public int getY()
+    {
         return sections.get(0).getY();
     }
 
-    public void move() {
-        if (!isAlive) return;
-        SnakeSection head = sections.get(0);
+    public SnakeDirection getDirection()
+    {
+        return direction;
+    }
 
-        if (direction == SnakeDirection.UP) {
-            sections.add(0, head = new SnakeSection(sections.get(0).getX(), sections.get(0).getY() - 1));
-            sections.remove(sections.size()-1);
-        }
-        else if (direction == SnakeDirection.DOWN) {
-            sections.add(0, head = new SnakeSection(sections.get(0).getX(), sections.get(0).getY() + 1));
-            sections.remove(sections.size()-1);
-        }
-        else if (direction == SnakeDirection.LEFT) {
-            sections.add(0, head = new SnakeSection(sections.get(0).getX() - 1, sections.get(0).getY()));
-            sections.remove(sections.size()-1);
-        }
-        else if (direction == SnakeDirection.RIGHT) {
-            sections.add(0, head = new SnakeSection(sections.get(0).getX() + 1, sections.get(0).getY()));
-            sections.remove(sections.size()-1);
-        }
-        if (head.getX() < 0 || head.getX() >= Room.game.getWidth() ||  head.getY() < 0 || head.getY() >= Room.game.getHeight()) isAlive = false;
+    public void setDirection(SnakeDirection direction)
+    {
+        this.direction = direction;
+    }
+
+    public ArrayList<SnakeSection> getSections()
+    {
+        return sections;
+    }
+
+    /**
+     * Метод перемещает змею на один ход.
+     * Направление перемещения задано переменной direction.
+     */
+    public void move()
+    {
+        if (!isAlive) return;
+
+        if (direction == SnakeDirection.UP)
+            move(0, -1);
+        else if (direction == SnakeDirection.RIGHT)
+            move(1, 0);
+        else if (direction == SnakeDirection.DOWN)
+            move(0, 1);
+        else if (direction == SnakeDirection.LEFT)
+            move(-1, 0);
+    }
+
+    /**
+     * Метод перемещает змею в соседнюю клетку.
+     * Кординаты клетки заданы относительно текущей головы с помощью переменных (dx, dy).
+     */
+    private void move(int dx, int dy)
+    {
+        //Создаем новую голову - новый "кусочек змеи".
+        SnakeSection head = new SnakeSection(sections.get(0).getX() + dx, sections.get(0).getY() + dy);
+
+        //Проверяем - не вылезла ли голова за границу комнаты
+        checkBorders(head);
+        if (!isAlive) return;
+
+        //Проверяем - не пересекает ли змея  саму себя
+        checkBody(head);
+        if (!isAlive) return;
+
+        //Проверяем - не съела ли змея мышь.
+        //Двигаем змею.
+    }
+
+    /**
+     *  Метод проверяет - находится ли новая голова в пределах комнаты
+     */
+    private void checkBorders(SnakeSection head)
+    {
+        if (head.getX() < 0 || head.getX() >= Room.game.getWidth() || head.getY() < 0 || head.getY() >= Room.game.getHeight()) isAlive = false;
+    }
+
+    /**
+     *  Метод проверяет - не совпадает ли голова с каким-нибудь участком тела змеи.
+     */
+    private void checkBody(SnakeSection head)
+    {
         if (sections.contains(head)) isAlive = false;
-        if (head.getX() == Room.game.getMouse().getX() && head.getY() == Room.game.getMouse().getY()) Room.game.eatMouse();
     }
 }
