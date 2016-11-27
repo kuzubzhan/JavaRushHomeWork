@@ -110,27 +110,34 @@ public class Room
     public void print()
     {
         //Создаем массив, куда будем "рисовать" текущее состояние игры
-        int[][] square = new int[width][height];
+        int[][] matrix = new int[height][width];
 
         //Рисуем все кусочки змеи
-        for (SnakeSection snakeSection : snake.getSections()) {
-            square[snakeSection.getX()][snakeSection.getY()] = 1;
+        ArrayList<SnakeSection> sections = new ArrayList<SnakeSection>(snake.getSections());
+        for (SnakeSection snakeSection : sections)
+        {
+            matrix[snakeSection.getY()][snakeSection.getX()] = 1;
         }
-        square[snake.getSections().get(0).getX()][snake.getSections().get(0).getY()] = 2;
+
+        //Рисуем голову змеи (4 - если змея мертвая)
+        matrix[snake.getY()][snake.getX()] = snake.isAlive() ? 2 : 4;
 
         //Рисуем мышь
-        square[mouse.getX()][mouse.getY()] = 3;
+        matrix[mouse.getY()][mouse.getX()] = 3;
 
         //Выводим все это на экран
-        String[] symbol = {".", "x", "X", "M"};
-        for (int x = 0; x < height; x++) {
-            for (int y = 0; y < width; y++) {
-
-                System.out.print(symbol[square[x][y]]);
+        String[] symbols = {" . ", " x ", " X ", "^_^", "RIP"};
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                System.out.print(symbols[matrix[y][x]]);
             }
             System.out.println();
         }
-
+        System.out.println();
+        System.out.println();
+        System.out.println();
     }
 
     /**
@@ -163,19 +170,22 @@ public class Room
         game.run();
     }
 
+    //Массив "пауз" в зависимости от уровня.
+    private static int[] levelDelay = {1000, 600, 550, 500, 480, 460, 440, 420, 400, 380, 360, 340, 320, 300, 285, 270};
 
     /**
      * Прогрмма делает паузу, длинна которой зависит от длинны змеи.
      */
-    private int[] level = {600, 500, 475, 450, 425, 400, 400, 375, 350, 325, 300};
     public void sleep()
     {
-        try {
-            int sizeSnake = snake.getSections().size();
-            int delay = sizeSnake < 11 ? level[sizeSnake] : 250;
+        try
+        {
+            int level = snake.getSections().size();
+            int delay = level < 15 ? levelDelay[level] : 250;
             Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        }
+        catch (InterruptedException e)
+        {
         }
     }
 }

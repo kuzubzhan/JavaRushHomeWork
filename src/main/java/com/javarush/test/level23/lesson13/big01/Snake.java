@@ -37,6 +37,27 @@ public class Snake {
     }
 
     public void move() {
+        if (!isAlive) return;
+        SnakeSection head = sections.get(0);
 
+        if (direction == SnakeDirection.UP) {
+            sections.add(0, head = new SnakeSection(sections.get(0).getX(), sections.get(0).getY() - 1));
+            sections.remove(sections.size()-1);
+        }
+        else if (direction == SnakeDirection.DOWN) {
+            sections.add(0, head = new SnakeSection(sections.get(0).getX(), sections.get(0).getY() + 1));
+            sections.remove(sections.size()-1);
+        }
+        else if (direction == SnakeDirection.LEFT) {
+            sections.add(0, head = new SnakeSection(sections.get(0).getX() - 1, sections.get(0).getY()));
+            sections.remove(sections.size()-1);
+        }
+        else if (direction == SnakeDirection.RIGHT) {
+            sections.add(0, head = new SnakeSection(sections.get(0).getX() + 1, sections.get(0).getY()));
+            sections.remove(sections.size()-1);
+        }
+        if (head.getX() < 0 || head.getX() >= Room.game.getWidth() ||  head.getY() < 0 || head.getY() >= Room.game.getHeight()) isAlive = false;
+        if (sections.contains(head)) isAlive = false;
+        if (head.getX() == Room.game.getMouse().getX() && head.getY() == Room.game.getMouse().getY()) Room.game.eatMouse();
     }
 }
