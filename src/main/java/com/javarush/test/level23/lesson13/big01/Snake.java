@@ -76,7 +76,8 @@ public class Snake
     private void move(int dx, int dy)
     {
         //Создаем новую голову - новый "кусочек змеи".
-        SnakeSection head = new SnakeSection(sections.get(0).getX() + dx, sections.get(0).getY() + dy);
+        SnakeSection head = sections.get(0);
+        head = new SnakeSection(head.getX() + dx, head.getY() + dy);
 
         //Проверяем - не вылезла ли голова за границу комнаты
         checkBorders(head);
@@ -87,13 +88,16 @@ public class Snake
         if (!isAlive) return;
 
         //Проверяем - не съела ли змея мышь.
-        if (head.getX() == Room.game.getMouse().getX() && head.getY() == Room.game.getMouse().getY()) {
-            sections.add(0, head);
-            Room.game.eatMouse();
+        Mouse mouse = Room.game.getMouse();
+        if (head.getX() == mouse.getX() && head.getY() == mouse.getY()) //съела
+        {
+            sections.add(0, head);                  //Добавили новую голову
+            Room.game.eatMouse();                   //Хвот не удаляем, но создаем новую мышь.
         }
-        else {  //Двигаем змею.
-            sections.add(0, head);
-            sections.remove(sections.size() - 1);
+        else //просто движется
+        {
+            sections.add(0, head);                  //добавили новую голову
+            sections.remove(sections.size() - 1);   //удалили последний элемент с хвоста
         }
     }
 
@@ -102,7 +106,10 @@ public class Snake
      */
     private void checkBorders(SnakeSection head)
     {
-        if (head.getX() < 0 || head.getX() >= Room.game.getWidth() || head.getY() < 0 || head.getY() >= Room.game.getHeight()) isAlive = false;
+        if ((head.getX() < 0 || head.getX() >= Room.game.getWidth()) || head.getY() < 0 || head.getY() >= Room.game.getHeight())
+        {
+            isAlive = false;
+        }
     }
 
     /**
@@ -110,6 +117,9 @@ public class Snake
      */
     private void checkBody(SnakeSection head)
     {
-        if (sections.contains(head)) isAlive = false;
+        if (sections.contains(head))
+        {
+            isAlive = false;
+        }
     }
 }
