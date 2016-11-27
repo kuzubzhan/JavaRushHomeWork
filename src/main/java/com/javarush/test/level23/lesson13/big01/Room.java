@@ -2,6 +2,7 @@ package com.javarush.test.level23.lesson13.big01;
 
 
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 /**
  * Основной класс программы.
@@ -109,9 +110,27 @@ public class Room
     public void print()
     {
         //Создаем массив, куда будем "рисовать" текущее состояние игры
+        int[][] square = new int[width][height];
+
         //Рисуем все кусочки змеи
+        for (SnakeSection snakeSection : snake.getSections()) {
+            square[snakeSection.getX()][snakeSection.getY()] = 1;
+        }
+        square[snake.getSections().get(0).getX()][snake.getSections().get(0).getY()] = 2;
+
         //Рисуем мышь
+        square[mouse.getX()][mouse.getY()] = 3;
+
         //Выводим все это на экран
+        String[] symbol = {".", "x", "X", "M"};
+        for (int x = 0; x < height; x++) {
+            for (int y = 0; y < width; y++) {
+
+                System.out.print(symbol[square[x][y]]);
+            }
+            System.out.println();
+        }
+
     }
 
     /**
