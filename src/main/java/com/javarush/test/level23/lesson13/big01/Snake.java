@@ -87,7 +87,14 @@ public class Snake
         if (!isAlive) return;
 
         //Проверяем - не съела ли змея мышь.
-        //Двигаем змею.
+        if (head.getX() == Room.game.getMouse().getX() && head.getY() == Room.game.getMouse().getY()) {
+            sections.add(0, head);
+            Room.game.eatMouse();
+        }
+        else {  //Двигаем змею.
+            sections.add(0, head);
+            sections.remove(sections.size() - 1);
+        }
     }
 
     /**
