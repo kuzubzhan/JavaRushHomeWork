@@ -17,6 +17,19 @@ public class Field {
         return matrix;
     }
 
+    public void print() {
+    }
+
+    public void removeFullLines() {
+    }
+
+    public Integer getValue(int x, int y) {
+        return null;
+    }
+
+    public void setValue(int x, int y, int value) {
+    }
+
     public Field(int width, int height, int[][] matrix) {
         this.width = width;
         this.height = height;
