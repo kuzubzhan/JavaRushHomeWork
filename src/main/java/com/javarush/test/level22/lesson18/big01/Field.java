@@ -30,9 +30,9 @@ public class Field {
     public void setValue(int x, int y, int value) {
     }
 
-    public Field(int width, int height, int[][] matrix) {
+    public Field(int width, int height) {
         this.width = width;
         this.height = height;
-        this.matrix = matrix;
+        this.matrix = new int[height][width];
     }
 }
