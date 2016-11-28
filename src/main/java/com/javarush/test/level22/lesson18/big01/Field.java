@@ -18,6 +18,15 @@ public class Field {
     }
 
     public void print() {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (matrix[y][x] == 0) {
+                    System.out.print(".");
+                }
+                else System.out.print("X");
+            }
+            System.out.println();
+        }
     }
 
     public void removeFullLines() {
