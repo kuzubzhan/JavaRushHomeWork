@@ -17,6 +17,38 @@ public class Figure {
         return matrix;
     }
 
+    public void left() {
+
+    }
+
+    public void right() {
+
+    }
+
+    public void down() {
+
+    }
+
+    public void up() {
+
+    }
+
+    public void downMaximum() {
+
+    }
+
+    public void rotate() {
+
+    }
+
+    public boolean isCurrentPositionAvailable() {
+        return true;
+    }
+
+    public void landed() {
+
+    }
+
     public Figure(int x, int y, int[][] matrix) {
         this.x = x;
         this.y = y;
