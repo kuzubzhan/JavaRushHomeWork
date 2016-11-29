@@ -18,18 +18,22 @@ public class Figure {
     }
 
     public void left() {
+        x--;
 
     }
 
     public void right() {
+        x++;
 
     }
 
     public void down() {
+        y++;
 
     }
 
     public void up() {
+        y--;
 
     }
 
