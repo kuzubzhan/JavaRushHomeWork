@@ -1,7 +1,6 @@
 package com.javarush.test.level22.lesson18.big01;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Класс Field описывает "поле клеток" игры Тетрис
@@ -116,36 +115,36 @@ public class Field
         System.out.println();
     }
 
-
     /**
      * Удаляем заполненные линии
      */
     public void removeFullLines()
     {
-        //Например так:
         //Создаем список для хранения линий
-        ArrayList<int[]> arrSaveLines = new ArrayList<>();
+        ArrayList<int[]> lines = new ArrayList<int[]>();
 
         //Копируем все непустые линии в список.
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if (1 != matrix[y][x]) {
-                    arrSaveLines.add(matrix[y]);
-                    break;
-                }
+        for (int i = 0; i <height; i++)
+        {
+            //подсчитываем количество единиц в строке - просто суммируем все ее значения
+            int count = 0;
+            for (int j = 0; j < width; j++)
+            {
+                count += matrix[i][j];
             }
+
+            //Если сумма строки не равно ее ширине - добавляем в список
+            if (count != width)
+                lines.add(matrix[i]);
         }
 
         //Добавляем недостающие строки в начало списка.
-        int sizeArr = arrSaveLines.size();
-        for (int i = 0; i < height - sizeArr; i++) {
-            arrSaveLines.add(0, new int[width]);
+        while (lines.size()<height)
+        {
+            lines.add(0,new int[width]);
         }
 
         //Преобразуем список обратно в матрицу
-        for (int i = 0; i < arrSaveLines.size(); i++) {
-            matrix[i] = arrSaveLines.get(i);
-            System.out.println(Arrays.toString(matrix[i]));
-        }
+        matrix = lines.toArray(new int[height][width]);
     }
 }
