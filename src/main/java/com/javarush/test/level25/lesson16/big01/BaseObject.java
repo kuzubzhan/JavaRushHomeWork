@@ -1,60 +1,107 @@
 package com.javarush.test.level25.lesson16.big01;
 
-public class BaseObject {
-    private double x;
-    private double y;
-    private double radius;
+/**
+ * Базовый класс для всех объектов игры.
+ */
+public abstract class BaseObject
+{
+    //координаты
+    protected double x;
+    protected double y;
+    //радиус объекта
+    protected double radius;
+    //состояние объект - жив ли объект
     private boolean isAlive;
 
-    public BaseObject(double x, double y, double radius) {
+    public BaseObject(double x, double y, double radius)
+    {
         this.x = x;
         this.y = y;
         this.radius = radius;
-        isAlive = true;
+        this.isAlive = true;
     }
 
-    public double getX() {
+    public double getX()
+    {
         return x;
     }
 
-    public void setX(double x) {
+    public void setX(double x)
+    {
         this.x = x;
     }
 
-    public double getY() {
+    public double getY()
+    {
         return y;
     }
 
-    public void setY(double y) {
+    public void setY(double y)
+    {
         this.y = y;
     }
 
-    public double getRadius() {
+    public double getRadius()
+    {
         return radius;
     }
 
-    public void setRadius(double radius) {
+    public void setRadius(double radius)
+    {
         this.radius = radius;
     }
 
-    public boolean isAlive() {
+    /**
+     * Метод рисует свой объект на "канвасе".
+     */
+    public void draw(Canvas canvas)
+    {
+        //do nothing
+    }
+
+    /**
+     * Двигаем себя на один ход.
+     */
+    public void move()
+    {
+        //do nothing
+    }
+
+    /**
+     * Проверяем - не выходит ли (x,y) за границы.
+     */
+    public void checkBorders(double minx, double maxx, double miny, double maxy)
+    {
+        if (x < minx) x = minx;
+        if (x > maxx) x = maxx;
+        if (y < miny) y = miny;
+        if (y > maxy) y = maxy;
+    }
+
+    public boolean isAlive()
+    {
         return isAlive;
     }
 
-    public void draw() {
-
+    public void setAlive(boolean alive)
+    {
+        isAlive = alive;
     }
 
-    public void move() {
-
-    }
-
-    public void die() {
+    public void die()
+    {
         isAlive = false;
     }
 
-    public boolean isIntersec(BaseObject o) {
-        double distance = Math.sqrt(Math.pow(x-o.getX(), 2) + Math.pow(y-o.getY(), 2));
-        return distance < Math.max(radius, o.getRadius());
+    /**
+     * Проверяем - пересекаются ли переданный(o) и наш(this) объекты.
+     */
+    public boolean isIntersec(BaseObject o)
+    {
+        double dx = x - o.x;
+        double dy = y - o.y;
+        double destination = Math.sqrt(dx * dx + dy * dy);
+        double destination2 = Math.max(radius, o.radius);
+        return destination <= destination2;
     }
 }
