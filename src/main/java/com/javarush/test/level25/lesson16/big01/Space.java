@@ -2,7 +2,6 @@ package com.javarush.test.level25.lesson16.big01;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -53,10 +52,10 @@ public class Space
                 System.out.print(event.getKeyCode());
                 if (event.getKeyCode() == KeyEvent.VK_LEFT)
                     ship.moveLeft();
-                    //Если "стрелка вправо" - сдвинуть фигурку вправо
+                //Если "стрелка вправо" - сдвинуть фигурку вправо
                 else if (event.getKeyCode() == KeyEvent.VK_RIGHT)
                     ship.moveRight();
-                    //Если "пробел" - запускаем шарик
+                //Если "пробел" - запускаем шарик
                 else if (event.getKeyCode() == KeyEvent.VK_SPACE)
                     ship.fire();
             }
@@ -91,8 +90,10 @@ public class Space
      */
     public void moveAllItems()
     {
-        //нужно получить список всех игрвых объектов и у каждого вызвать метод move().
-        for (BaseObject bo : getAllItems()) bo.move();
+        for (BaseObject object : getAllItems())
+        {
+            object.move();
+        }
     }
 
     /**
@@ -100,13 +101,11 @@ public class Space
      */
     public List<BaseObject> getAllItems()
     {
-        //нужно создать новый список и положить в него все игровые объекты.
-        List<BaseObject> objects = new ArrayList<>();
-        objects.add(getShip());
-        objects.addAll(getUfos());
-        objects.addAll(getRockets());
-        objects.addAll(getBombs());
-        return objects;
+        ArrayList<BaseObject> list = new ArrayList<BaseObject>(ufos);
+        list.add(ship);
+        list.addAll(bombs);
+        list.addAll(rockets);
+        return list;
     }
 
     /**
@@ -114,12 +113,15 @@ public class Space
      */
     public void createUfo()
     {
-        //тут нужно создать новый НЛО.
-        //1 раз за 10 вызовов метода.
         if (ufos.size() > 0) return;
-        int toCreateUfo = (int) (Math.random() * 10);
-        if (toCreateUfo == 0)
-            ufos.add(new Ufo(width/2, 0));
+
+        int random10 = (int) (Math.random() * 10);
+        if (random10 == 0)
+        {
+            double x = Math.random() * 20;
+            double y = Math.random() * 10;
+            ufos.add(new Ufo(x, y));
+        }
     }
 
     /**
@@ -129,13 +131,16 @@ public class Space
      */
     public void checkBombs()
     {
-        //тут нужно проверить все возможные столкновения для каждой бомбы.
-        for (BaseObject bomb : getBombs()) {
-            if (bomb.isIntersec(ship)) {
+        for (Bomb bomb : bombs)
+        {
+            if (ship.isIntersec(bomb))
+            {
                 ship.die();
                 bomb.die();
             }
-            else if (bomb.getY() >= height) bomb.die();
+
+            if (bomb.getY() >= height)
+                bomb.die();
         }
     }
 
@@ -146,17 +151,19 @@ public class Space
      */
     public void checkRockets()
     {
-        //тут нужно проверить все возможные столкновения для каждой ракеты.
-        for (BaseObject rocket : getRockets()) {
-
-            for (BaseObject ufo : getUfos()) {
-                if (rocket.isIntersec(ufo)) {
+        for (Rocket rocket : rockets)
+        {
+            for (Ufo ufo : ufos)
+            {
+                if (ufo.isIntersec(rocket))
+                {
                     ufo.die();
                     rocket.die();
                 }
             }
 
-            if (rocket.getY() <= 0) rocket.die();
+            if (rocket.getY() <= 0)
+                rocket.die();
         }
     }
 
@@ -165,12 +172,10 @@ public class Space
      */
     public void removeDead()
     {
-        //тут нужно удалить все умершие объекты из списков.
-        //Кроме космического корабля - по нему определяем ищет еще игра или нет.
-        for (BaseObject object : new ArrayList<BaseObject>(ufos))
+        for (BaseObject object : new ArrayList<BaseObject>(bombs))
         {
             if (!object.isAlive())
-                ufos.remove(object);
+                bombs.remove(object);
         }
 
         for (BaseObject object : new ArrayList<BaseObject>(rockets))
@@ -179,10 +184,10 @@ public class Space
                 rockets.remove(object);
         }
 
-        for (BaseObject object : new ArrayList<BaseObject>(bombs))
+        for (BaseObject object : new ArrayList<BaseObject>(ufos))
         {
             if (!object.isAlive())
-                bombs.remove(object);
+                ufos.remove(object);
         }
     }
 
@@ -193,7 +198,31 @@ public class Space
      */
     public void draw(Canvas canvas)
     {
-        //тут нужно отрисовать все объекты игры
+        //draw game
+        for (int i = 0; i < width + 2; i++)
+        {
+            for (int j = 0; j < height + 2; j++)
+            {
+                canvas.setPoint(i, j, '.');
+            }
+        }
+
+        for (int i = 0; i < width + 2; i++)
+        {
+            canvas.setPoint(i, 0, '-');
+            canvas.setPoint(i, height + 1, '-');
+        }
+
+        for (int i = 0; i < height + 2; i++)
+        {
+            canvas.setPoint(0, i, '|');
+            canvas.setPoint(width + 1, i, '|');
+        }
+
+        for (BaseObject object : getAllItems())
+        {
+            object.draw(canvas);
+        }
     }
 
 
