@@ -45,4 +45,17 @@ public class ConsoleHelper {
 
         return strings;
     }
+
+    public static Operation askOperation() {
+        writeMessage("Enter operation number : 1-4");
+        String operation = readString();
+        Operation result = null;
+        try {
+            result = Operation.getAllowableOperationByOrdinal(Integer.parseInt(operation));
+        } catch (Exception e) {
+            askOperation();
+        }
+
+        return result;
+    }
 }
