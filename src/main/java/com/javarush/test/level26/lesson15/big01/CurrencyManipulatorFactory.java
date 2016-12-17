@@ -1,5 +1,6 @@
 package com.javarush.test.level26.lesson15.big01;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,5 +19,9 @@ public class CurrencyManipulatorFactory {
         }
 
         return result;
+    }
+
+    public static Collection<CurrencyManipulator> getAllCurrencyManipulators() {
+        return currManMap.values();
     }
 }
