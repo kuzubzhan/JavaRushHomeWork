@@ -5,11 +5,15 @@ import com.javarush.test.level26.lesson15.big01.CurrencyManipulator;
 import com.javarush.test.level26.lesson15.big01.CurrencyManipulatorFactory;
 
 import java.util.Collection;
+import java.util.ResourceBundle;
 
 class InfoCommand implements Command {
+    private ResourceBundle res = ResourceBundle.getBundle("com.javarush.test.level26.lesson15.big01.resources.info_en");
+
     @Override
     public void execute() {
         boolean money = false;
+        ConsoleHelper.writeMessage(res.getString("before"));
         Collection<CurrencyManipulator> cm = CurrencyManipulatorFactory.getAllCurrencyManipulators();
         for (CurrencyManipulator curr : cm) {
             money = curr.hasMoney();
@@ -17,6 +21,6 @@ class InfoCommand implements Command {
                 ConsoleHelper.writeMessage(curr.getCurrencyCode() + " - " + curr.getTotalAmount());
             }
         }
-        if (!money) ConsoleHelper.writeMessage("No money available.");
+        if (!money) ConsoleHelper.writeMessage(res.getString("no.money"));
     }
 }
