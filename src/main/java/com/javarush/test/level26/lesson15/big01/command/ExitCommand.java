@@ -1,12 +1,13 @@
 package com.javarush.test.level26.lesson15.big01.command;
 
+import com.javarush.test.level26.lesson15.big01.CashMachine;
 import com.javarush.test.level26.lesson15.big01.ConsoleHelper;
 import com.javarush.test.level26.lesson15.big01.exception.InterruptOperationException;
 
 import java.util.ResourceBundle;
 
 class ExitCommand implements Command {
-    private ResourceBundle res = ResourceBundle.getBundle("com.javarush.test.level26.lesson15.big01.resources.exit_en");
+    private ResourceBundle res = ResourceBundle.getBundle(CashMachine.RESOURCE_PATH + "exit_en");
 
     @Override
     public void execute() throws InterruptOperationException {

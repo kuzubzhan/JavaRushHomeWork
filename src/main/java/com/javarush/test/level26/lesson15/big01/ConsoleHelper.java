@@ -9,10 +9,14 @@ import java.util.ResourceBundle;
 
 public class ConsoleHelper {
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    private static ResourceBundle res = ResourceBundle.getBundle("com.javarush.test.level26.lesson15.big01.resources.common_en");
+    private static ResourceBundle res = ResourceBundle.getBundle(CashMachine.RESOURCE_PATH + "common_en");
 
     public static void writeMessage(String message) {
         System.out.println(message);
+    }
+
+    public static void printExitMessage() {
+        ConsoleHelper.writeMessage(res.getString("the.end"));
     }
 
     public static String readString() throws InterruptOperationException {
@@ -53,7 +57,11 @@ public class ConsoleHelper {
     }
 
     public static Operation askOperation() throws InterruptOperationException {
-        writeMessage("Enter operation number : 1-4");
+        writeMessage(res.getString("choose.operation") + " \n" +
+                res.getString("operation.INFO") + ": 1;\n" +
+                res.getString("operation.DEPOSIT") + ": 2;\n" +
+                res.getString("operation.WITHDRAW") + ": 3;\n" +
+                res.getString("operation.EXIT") + ": 4");
         String operation = readString();
         Operation result = null;
         try {
