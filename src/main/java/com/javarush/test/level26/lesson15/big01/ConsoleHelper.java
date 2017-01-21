@@ -5,9 +5,11 @@ import com.javarush.test.level26.lesson15.big01.exception.InterruptOperationExce
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ResourceBundle;
 
 public class ConsoleHelper {
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    private static ResourceBundle res = ResourceBundle.getBundle("com.javarush.test.level26.lesson15.big01.resources.common_en");
 
     public static void writeMessage(String message) {
         System.out.println(message);
@@ -17,7 +19,7 @@ public class ConsoleHelper {
         String result = "";
         try {
             result = br.readLine();
-            if ("exit".equalsIgnoreCase(result))
+            if (res.getString("operation.EXIT").equalsIgnoreCase(result))
                 throw new InterruptOperationException();
         } catch (IOException e) {
         }
@@ -26,24 +28,24 @@ public class ConsoleHelper {
 
     public static String askCurrencyCode() throws InterruptOperationException {
         String result;
-        writeMessage("Enter code");
-        while ((result = readString()).length() != 3) writeMessage("Mistake");
+        writeMessage(res.getString("choose.currency.code"));
+        while ((result = readString()).length() != 3) writeMessage(res.getString("invalid.data"));
 
         return result.toUpperCase();
     }
 
     public static String[] getValidTwoDigits(String currencyCode) throws InterruptOperationException {
         String[] strings;
-        writeMessage("Enter two integer");
+        writeMessage(String.format(res.getString("choose.denomination.and.count.format"), currencyCode));
 
         while (true) {
             strings = readString().split("\\s");
             try {
                 if (strings.length == 2 && Integer.parseInt(strings[0]) > 0 && Integer.parseInt(strings[1]) > 0)
                     break;
-                writeMessage("Mistake of data");
+                writeMessage(res.getString("invalid.data"));
             } catch (Exception e) {
-                writeMessage("Mistake of data and Exception");
+                writeMessage(res.getString("invalid.data"));
             }
         }
 
@@ -57,6 +59,7 @@ public class ConsoleHelper {
         try {
             result = Operation.getAllowableOperationByOrdinal(Integer.parseInt(operation));
         } catch (Exception e) {
+            writeMessage(res.getString("invalid.data"));
             askOperation();
         }
 
