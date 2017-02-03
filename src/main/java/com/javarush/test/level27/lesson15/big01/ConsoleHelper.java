@@ -25,7 +25,11 @@ public class ConsoleHelper {
         writeMessage("Choose dishes");
         writeMessage(Dish.allDishesToString());
         while (! "exit".equals((str = readString()))) {
-            dishList.add(Dish.valueOf(str));
+            try {
+                dishList.add(Dish.valueOf(str));
+            } catch (IllegalArgumentException e) {
+                ConsoleHelper.writeMessage(str + " is not detected");
+            }
         }
         return dishList;
     }
