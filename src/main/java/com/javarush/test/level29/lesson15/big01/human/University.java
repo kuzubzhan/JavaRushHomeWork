@@ -14,18 +14,43 @@ public class University {
         students = new ArrayList<>();
     }
 
-    public Student getStudentWithAverageGrade() {
-        //TODO:
+    public Student getStudentWithAverageGrade(double averageGrade) {
+        if (!students.isEmpty()) {
+            for (Student student : students) {
+                if (student.getAverageGrade() == averageGrade)
+                    return student;
+            }
+        }
         return null;
     }
 
-    public Student getStudentWithMaxAverageGrade(double averageGrade) {
-        //TODO:
+    public Student getStudentWithMaxAverageGrade() {
+        if (!students.isEmpty()) {
+            Student student = students.get(0);
+            for (Student student1 : students) {
+                if (student1.getAverageGrade() > student.getAverageGrade())
+                    student = student1;
+            }
+            return student;
+        }
         return null;
     }
 
-    public void getStudentWithMinAverageGradeAndExpel() {
-        //TODO:
+    public Student getStudentWithMinAverageGrade() {
+        if (!students.isEmpty()) {
+            Student student = students.get(0);
+            for (Student student1 : students) {
+                if (student1.getAverageGrade() < student.getAverageGrade())
+                    student = student1;
+            }
+            return student;
+        }
+        return null;
+    }
+
+    public void expel(Student student) {
+        if (students.contains(student))
+            students.remove(student);
     }
 
     public List<Student> getStudents() {
