@@ -1,6 +1,7 @@
 package com.javarush.test.level27.lesson15.big01;
 
 import com.javarush.test.level27.lesson15.big01.ad.AdvertisementManager;
+import com.javarush.test.level27.lesson15.big01.ad.NoVideoAvailableException;
 import com.javarush.test.level27.lesson15.big01.kitchen.Order;
 
 import java.io.IOException;
@@ -17,7 +18,7 @@ public class Tablet extends Observable {
     }
 
     public void createOrder() {
-        Order order;
+        Order order = null;
         try {
             order = new Order(this);
             if (!order.isEmpty()) {
@@ -28,6 +29,9 @@ public class Tablet extends Observable {
             new AdvertisementManager(order.getTotalCookingTime() * 60).processVideos();
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Console is unavailable.");
+        }
+        catch (NoVideoAvailableException e) {
+            logger.log(Level.INFO, "No video is available for the order " + order);
         }
     }
 
