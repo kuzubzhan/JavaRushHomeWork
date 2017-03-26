@@ -14,6 +14,27 @@ public class Server {
         private Handler(Socket socket) {
             this.socket = socket;
         }
+        @Override
+        public void run() {
+            String newClientName = null;
+            ConsoleHelper.writeMessage(String.format("New connection established %s ", socket.getRemoteSocketAddress()));
+            try (Connection connection = new Connection(socket)) {
+                newClientName = serverHandshake(connection);
+                sendBroadcastMessage(new Message(MessageType.USER_ADDED, newClientName));
+                sendListOfUsers(connection, newClientName);
+                serverMainLoop(connection, newClientName);
+            } catch (IOException | ClassNotFoundException e) {
+                ConsoleHelper.writeMessage("IO error or ClassNotFound error");
+            }
+            finally {
+                if (newClientName != null) {
+                    connectionMap.remove(newClientName);
+                    sendBroadcastMessage(new Message(MessageType.USER_REMOVED, newClientName));
+                }
+            }
+            ConsoleHelper.writeMessage("Connection is closed");
+        }
+
         private String serverHandshake(Connection connection) throws IOException, ClassNotFoundException {
             while (true) {
                 connection.send(new Message(MessageType.NAME_REQUEST));
