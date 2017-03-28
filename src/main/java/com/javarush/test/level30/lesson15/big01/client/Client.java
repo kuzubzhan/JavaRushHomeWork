@@ -6,6 +6,7 @@ import com.javarush.test.level30.lesson15.big01.Message;
 import com.javarush.test.level30.lesson15.big01.MessageType;
 
 import java.io.IOException;
+import java.net.Socket;
 
 public class Client {
     protected Connection connection;
@@ -53,6 +54,20 @@ public class Client {
                     informAboutDeletingNewUser(message.getData());
                 }
                 else throw new IOException("Unexpected MessageType");
+            }
+        }
+
+        @Override
+        public void run() {
+            String address = getServerAddress();
+            int port = getServerPort();
+            try {
+                Socket socket = new Socket(address, port);
+                connection = new Connection(socket);
+                clientHandshake();
+                clientMainLoop();
+            } catch (IOException | ClassNotFoundException e) {
+                notifyConnectionStatusChanged(false);
             }
         }
     }
