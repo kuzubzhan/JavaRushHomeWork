@@ -1,7 +1,5 @@
 package com.javarush.test.level31.lesson15.big01;
 
-import com.javarush.test.level31.lesson15.big01.command.ExitCommand;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
@@ -19,6 +17,6 @@ public class Archiver {
         path = Paths.get(br.readLine());
         fileManager.createZip(path);
 
-        new ExitCommand().execute();
+        CommandExecutor.execute(Operation.EXIT);
     }
 }
