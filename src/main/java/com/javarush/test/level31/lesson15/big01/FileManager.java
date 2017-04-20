@@ -22,15 +22,21 @@ public class FileManager {
     }
 
     private void collectFileList(Path path) throws IOException {
+        // Добавляем только файлы
         if (Files.isRegularFile(path)) {
-            fileList.add(rootPath.relativize(path));
+            Path relativePath = rootPath.relativize(path);
+            fileList.add(relativePath);
         }
-        else if (Files.isDirectory(path)) {
-            DirectoryStream<Path> stream = Files.newDirectoryStream(path);
-            for (Path childPath : stream) {
-                collectFileList(childPath);
+
+        // Добавляем содержимое директории
+        if (Files.isDirectory(path)) {
+            // Рекурсивно проходимся по всему содержмому директории
+            // Чтобы не писать код по вызову close для DirectoryStream, обернем вызов newDirectoryStream в try-with-resources
+            try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path)) {
+                for (Path file : directoryStream) {
+                    collectFileList(file);
+                }
             }
-            stream.close();
         }
     }
 }
