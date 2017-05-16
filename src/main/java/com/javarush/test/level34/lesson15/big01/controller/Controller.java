@@ -1,6 +1,7 @@
 package com.javarush.test.level34.lesson15.big01.controller;
 
 import com.javarush.test.level34.lesson15.big01.model.Direction;
+import com.javarush.test.level34.lesson15.big01.model.GameObjects;
 import com.javarush.test.level34.lesson15.big01.model.Model;
 import com.javarush.test.level34.lesson15.big01.view.View;
 
@@ -16,6 +17,10 @@ public class Controller implements EventListener {
 
     public static void main(String[] args) {
         Controller controller = new Controller();
+    }
+
+    public GameObjects getGameObjects() {
+        return model.getGameObjects();
     }
 
     @Override
