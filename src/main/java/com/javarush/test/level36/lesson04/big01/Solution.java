@@ -24,5 +24,6 @@ public class Solution {
         usersView.fireEventShowDeletedUsers();
         usersView.fireEventOpenUserEditForm(126);
         editUserView.fireEventUserDeleted(124);
+        editUserView.fireEventUserChanged("Thelonious Monk", 125, 3);
     }
 }
