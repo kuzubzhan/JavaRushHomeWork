@@ -14,11 +14,16 @@ public class Advertisement {
         this.initialAmount = initialAmount;
         this.hits = hits;
         this.duration = duration;
-        this.amountPerOneDisplaying = initialAmount / hits;
+        if (hits > 0)
+            amountPerOneDisplaying = Math.round(initialAmount/hits);
     }
 
     public String getName() {
         return name;
+    }
+
+    public int getHits() {
+        return hits;
     }
 
     public int getDuration() {
