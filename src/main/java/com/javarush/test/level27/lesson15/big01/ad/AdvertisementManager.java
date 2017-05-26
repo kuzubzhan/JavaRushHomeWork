@@ -1,6 +1,9 @@
 package com.javarush.test.level27.lesson15.big01.ad;
 
 import com.javarush.test.level27.lesson15.big01.ConsoleHelper;
+import com.javarush.test.level27.lesson15.big01.statistic.StatisticManager;
+import com.javarush.test.level27.lesson15.big01.statistic.event.NoAvailableVideoEventDataRow;
+import com.javarush.test.level27.lesson15.big01.statistic.event.VideoSelectedEventDataRow;
 
 import java.util.*;
 
@@ -25,14 +28,16 @@ public class AdvertisementManager {
             }
         });
 
-        boolean isNotExist = true;
+        if (outAdvList.isEmpty()) {
+            StatisticManager.getInstance().register(new NoAvailableVideoEventDataRow(timeSeconds));
+            throw new NoVideoAvailableException();
+        }
+
+        StatisticManager.getInstance().register(new VideoSelectedEventDataRow(outAdvList, getAllAmount(outAdvList), getAllDuration(outAdvList)));
         for (Advertisement ad : outAdvList) {
-            isNotExist = false;
             ConsoleHelper.writeMessage(String.format("%s is displaying... %d, %d", ad.getName(), ad.getAmountPerOneDisplaying(), ad.getAmountPerOneDisplaying() * 1000 / ad.getDuration()));
             ad.revalidate();
         }
-        if (isNotExist)
-            throw new NoVideoAvailableException();
     }
 
     private List<Advertisement> tempStorage = new ArrayList<>();

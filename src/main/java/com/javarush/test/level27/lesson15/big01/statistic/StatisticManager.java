@@ -20,7 +20,7 @@ public class StatisticManager {
     }
 
     public void register(EventDataRow data) {
-        // TODO: 26.05.17
+        storage.put(data);
     }
 
     private class StatisticStorage {
@@ -31,6 +31,10 @@ public class StatisticManager {
             for (EventType eventType : EventType.values()) {
                 map.put(eventType, new ArrayList<EventDataRow>());
             }
+        }
+
+        private void put(EventDataRow data) {
+            map.get(data.getType()).add(data);
         }
     }
 }
