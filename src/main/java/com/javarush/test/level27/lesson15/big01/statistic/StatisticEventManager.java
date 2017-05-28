@@ -10,16 +10,16 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class StatisticManager {
-    private static StatisticManager ourInstance = new StatisticManager();
+public class StatisticEventManager {
+    private static StatisticEventManager ourInstance = new StatisticEventManager();
     private StatisticStorage storage = new StatisticStorage();
     private Set<Cook> cooks = new HashSet<>();
 
-    public static StatisticManager getInstance() {
+    public static StatisticEventManager getInstance() {
         return ourInstance;
     }
 
-    private StatisticManager() {
+    private StatisticEventManager() {
     }
 
     public void register(EventDataRow data) {
