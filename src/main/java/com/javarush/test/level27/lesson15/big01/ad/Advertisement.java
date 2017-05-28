@@ -15,7 +15,7 @@ public class Advertisement {
         this.hits = hits;
         this.duration = duration;
         if (hits > 0)
-            amountPerOneDisplaying = Math.round(initialAmount/hits);
+            amountPerOneDisplaying = Math.round(initialAmount / hits);
     }
 
     public String getName() {
@@ -38,5 +38,6 @@ public class Advertisement {
         if (hits < 1)
             throw new UnsupportedOperationException();
         hits--;
+        if (hits == 1) amountPerOneDisplaying += initialAmount % amountPerOneDisplaying;
     }
 }
