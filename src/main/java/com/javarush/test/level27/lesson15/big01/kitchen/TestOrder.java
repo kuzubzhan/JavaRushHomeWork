@@ -4,6 +4,7 @@ import com.javarush.test.level27.lesson15.big01.Tablet;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TestOrder extends Order {
@@ -14,10 +15,8 @@ public class TestOrder extends Order {
     @Override
     protected List<Dish> initDishes() throws IOException {
         List<Dish> dishes = new ArrayList<>();
-        for (Dish dish : Dish.values()) {
-            if (Math.random() * 10 <= 5)
-                dishes.add(dish);
-        }
+        Collections.addAll(dishes, Dish.values());
+        Collections.shuffle(dishes);
         return dishes;
     }
 }
