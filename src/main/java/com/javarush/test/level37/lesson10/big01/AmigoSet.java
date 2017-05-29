@@ -1,11 +1,14 @@
 package com.javarush.test.level37.lesson10.big01;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
 
 public class AmigoSet<E> extends AbstractSet<E> implements Set<E>, Serializable, Cloneable {
     private static final Object PRESENT = new Object();
-    private HashMap<E, Object> map;
+    private transient HashMap<E, Object> map;
 
     public AmigoSet() {
         map = new HashMap<>();
@@ -59,6 +62,35 @@ public class AmigoSet<E> extends AbstractSet<E> implements Set<E>, Serializable,
             return newSet;
         } catch (CloneNotSupportedException e) {
             throw new InternalError();
+        }
+    }
+
+    private void writeObject(ObjectOutputStream s) throws IOException {
+        s.defaultWriteObject();
+
+        int capacity = HashMapReflectionHelper.callHiddenMethod(map, "capacity");
+        float loadFactor = HashMapReflectionHelper.callHiddenMethod(map, "loadFactor");
+        s.writeInt(capacity);
+        s.writeFloat(loadFactor);
+
+        s.writeInt(map.size());
+
+        for (E e : map.keySet())
+            s.writeObject(e);
+    }
+
+    private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+        s.defaultReadObject();
+
+        int capacity = s.readInt();
+        float loadFactor = s.readFloat();
+        map = new HashMap<>(capacity, loadFactor);
+
+        int size = s.readInt();
+
+        for (int i = 0; i < size; i++) {
+            E e = (E) s.readObject();
+            map.put(e, PRESENT);
         }
     }
 }
