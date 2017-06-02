@@ -1,6 +1,7 @@
 package com.javarush.test.level39.lesson09.big01;
 
 import com.javarush.test.level39.lesson09.big01.query.IPQuery;
+import com.javarush.test.level39.lesson09.big01.query.UserQuery;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,7 +11,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class LogParser implements IPQuery {
+public class LogParser implements IPQuery, UserQuery {
     private Path logDir;
 
     public LogParser(Path logDir) {
@@ -109,5 +110,115 @@ public class LogParser implements IPQuery {
             }
         }
         return list;
+    }
+
+    @Override
+    public Set<String> getAllUsers() {
+        return getSetUsersByEventOrTask(null, null, null, null, 0);
+    }
+
+    @Override
+    public int getNumberOfUsers(Date after, Date before) {
+        return getSetUsersByEventOrTask(null, null, after, before, 0).size();
+    }
+
+    @Override
+    public int getNumberOfUserEvents(String user, Date after, Date before) {
+        List<String[]> list = getParseFile(after, before);
+        Set<String> set = new LinkedHashSet<>();
+        for (String[] strings : list) {
+            if (strings[1].equals(user)) {
+                if (strings[3].startsWith(Event.SOLVE_TASK.toString()) || strings[3].startsWith(Event.DONE_TASK.toString())) {
+                    String[] slitEvent = strings[3].split("\\s");
+                    set.add(slitEvent[0]);
+                } else if (!strings[3].startsWith(Event.SOLVE_TASK.toString()) && !strings[3].startsWith(Event.DONE_TASK.toString())) {
+                    set.add(strings[3]);
+                }
+            }
+        }
+        return set.size();
+    }
+
+    @Override
+    public Set<String> getUsersForIP(String ip, Date after, Date before) {
+        List<String[]> list = getParseFile(after, before);
+        Set<String> set = new LinkedHashSet<>();
+        for (String[] strings : list) {
+            if (strings[0].equals(ip))
+                set.add(strings[1]);
+        }
+        return set;
+    }
+
+    @Override
+    public Set<String> getLoggedUsers(Date after, Date before) {
+        return getSetUsersByEventOrTask(Event.LOGIN, null, after, before, 0);
+    }
+
+    @Override
+    public Set<String> getDownloadedPluginUsers(Date after, Date before) {
+        return getSetUsersByEventOrTask(Event.DOWNLOAD_PLUGIN, null, after, before, 0);
+    }
+
+    @Override
+    public Set<String> getWroteMessageUsers(Date after, Date before) {
+        return getSetUsersByEventOrTask(Event.WRITE_MESSAGE, null, after, before, 0);
+    }
+
+    @Override
+    public Set<String> getSolvedTaskUsers(Date after, Date before) {
+        return getSetUsersByEventOrTask(Event.SOLVE_TASK, null, after, before, 0);
+    }
+
+    @Override
+    public Set<String> getSolvedTaskUsers(Date after, Date before, int task) {
+        return getSetUsersByEventOrTask(Event.SOLVE_TASK, null, after, before, task);
+    }
+
+    @Override
+    public Set<String> getDoneTaskUsers(Date after, Date before) {
+        return getSetUsersByEventOrTask(Event.DONE_TASK, null, after, before, 0);
+    }
+
+    @Override
+    public Set<String> getDoneTaskUsers(Date after, Date before, int task) {
+        return getSetUsersByEventOrTask(Event.DONE_TASK, null, after, before, task);
+    }
+
+    private Set<String> getSetUsersByEventOrTask(Event event, Status status, Date after, Date before, int task) {
+        List<String[]> list = getParseFile(after, before);
+        Set<String> set = new LinkedHashSet<>();
+        for (String[] strings : list) {
+            if (strings[3].startsWith(Event.SOLVE_TASK.toString()) || strings[3].startsWith(Event.DONE_TASK.toString())) {
+                String[] slitEvent = strings[3].split("\\s");
+                if (event != null) {
+                    if (slitEvent[0].equals(event.toString())) {
+                        if (status != null) {
+                            if (strings[4].equals(status.toString())) {
+                                if (task > 0) {
+                                    if (slitEvent[1].equals(String.valueOf(task)))
+                                        set.add(strings[1]);
+                                } else set.add(strings[1]);
+                            }
+                        } else {
+                            if (task > 0) {
+                                if (slitEvent[1].equals(String.valueOf(task)))
+                                    set.add(strings[1]);
+                            } else set.add(strings[1]);
+                        }
+                    }
+                } else set.add(strings[1]);
+            } else if (!strings[3].startsWith(Event.SOLVE_TASK.toString()) && !strings[3].startsWith(Event.DONE_TASK.toString())) {
+                if (event != null) {
+                    if (strings[3].equals(event.toString())) {
+                        if (status != null) {
+                            if (strings[4].equals(status.toString()))
+                                set.add(strings[1]);
+                        } else set.add(strings[1]);
+                    }
+                } else set.add(strings[1]);
+            }
+        }
+        return set;
     }
 }
