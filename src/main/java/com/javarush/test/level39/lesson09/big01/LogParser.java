@@ -1,6 +1,7 @@
 package com.javarush.test.level39.lesson09.big01;
 
 import com.javarush.test.level39.lesson09.big01.query.DateQuery;
+import com.javarush.test.level39.lesson09.big01.query.EventQuery;
 import com.javarush.test.level39.lesson09.big01.query.IPQuery;
 import com.javarush.test.level39.lesson09.big01.query.UserQuery;
 
@@ -13,7 +14,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class LogParser implements IPQuery, UserQuery, DateQuery {
+public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
     private Path logDir;
 
     public LogParser(Path logDir) {
@@ -391,5 +392,170 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
             }
         }
         return set;
+    }
+
+    @Override
+    public int getNumberOfAllEvents(Date after, Date before) {
+        return getAllEvents(after, before).size();
+    }
+
+    @Override
+    public Set<Event> getAllEvents(Date after, Date before) {
+        List<String[]> list = getParseFile(after, before);
+        Set<Event> set = new LinkedHashSet<>();
+        for (String[] strings : list) {
+            if (strings[3].startsWith(Event.SOLVE_TASK.toString()) || strings[3].startsWith(Event.DONE_TASK.toString())) {
+                String[] slitEvent = strings[3].split("\\s");
+                if (slitEvent[0].equals(Event.SOLVE_TASK.toString()) || slitEvent[0].equals(Event.DONE_TASK.toString()))
+                    set.add(Event.valueOf(slitEvent[0]));
+            } else if (!strings[3].startsWith(Event.SOLVE_TASK.toString()) && !strings[3].startsWith(Event.DONE_TASK.toString())) {
+                set.add(Event.valueOf(strings[3]));
+            }
+        }
+        return set;
+    }
+
+    @Override
+    public Set<Event> getEventsForIP(String ip, Date after, Date before) {
+        List<String[]> list = getParseFile(after, before);
+        Set<Event> set = new LinkedHashSet<>();
+        for (String[] strings : list) {
+            if (strings[3].startsWith(Event.SOLVE_TASK.toString()) || strings[3].startsWith(Event.DONE_TASK.toString())) {
+                String[] slitEvent = strings[3].split("\\s");
+                if (slitEvent[0].equals(Event.SOLVE_TASK.toString()) || slitEvent[0].equals(Event.DONE_TASK.toString())) {
+                    if (strings[0].equals(ip))
+                        set.add(Event.valueOf(slitEvent[0]));
+                }
+            } else if (!strings[3].startsWith(Event.SOLVE_TASK.toString()) && !strings[3].startsWith(Event.DONE_TASK.toString())) {
+                if (strings[0].equals(ip))
+                    set.add(Event.valueOf(strings[3]));
+            }
+        }
+        return set;
+    }
+
+    @Override
+    public Set<Event> getEventsForUser(String user, Date after, Date before) {
+        List<String[]> list = getParseFile(after, before);
+        Set<Event> set = new LinkedHashSet<>();
+        for (String[] strings : list) {
+            if (strings[3].startsWith(Event.SOLVE_TASK.toString()) || strings[3].startsWith(Event.DONE_TASK.toString())) {
+                String[] slitEvent = strings[3].split("\\s");
+                if (slitEvent[0].equals(Event.SOLVE_TASK.toString()) || slitEvent[0].equals(Event.DONE_TASK.toString())) {
+                    if (strings[1].equals(user))
+                        set.add(Event.valueOf(slitEvent[0]));
+                }
+            } else if (!strings[3].startsWith(Event.SOLVE_TASK.toString()) && !strings[3].startsWith(Event.DONE_TASK.toString())) {
+                if (strings[1].equals(user))
+                    set.add(Event.valueOf(strings[3]));
+            }
+        }
+        return set;
+    }
+
+    @Override
+    public Set<Event> getFailedEvents(Date after, Date before) {
+        List<String[]> list = getParseFile(after, before);
+        Set<Event> set = new LinkedHashSet<>();
+        for (String[] strings : list) {
+            if (strings[3].startsWith(Event.SOLVE_TASK.toString()) || strings[3].startsWith(Event.DONE_TASK.toString())) {
+                String[] slitEvent = strings[3].split("\\s");
+                if (slitEvent[0].equals(Event.SOLVE_TASK.toString()) || slitEvent[0].equals(Event.DONE_TASK.toString())) {
+                    if (strings[4].equals(Status.FAILED.toString()))
+                        set.add(Event.valueOf(slitEvent[0]));
+                }
+            } else if (!strings[3].startsWith(Event.SOLVE_TASK.toString()) && !strings[3].startsWith(Event.DONE_TASK.toString())) {
+                if (strings[4].equals(Status.FAILED.toString()))
+                    set.add(Event.valueOf(strings[3]));
+            }
+        }
+        return set;
+    }
+
+    @Override
+    public Set<Event> getErrorEvents(Date after, Date before) {
+        List<String[]> list = getParseFile(after, before);
+        Set<Event> set = new LinkedHashSet<>();
+        for (String[] strings : list) {
+            if (strings[3].startsWith(Event.SOLVE_TASK.toString()) || strings[3].startsWith(Event.DONE_TASK.toString())) {
+                String[] slitEvent = strings[3].split("\\s");
+                if (slitEvent[0].equals(Event.SOLVE_TASK.toString()) || slitEvent[0].equals(Event.DONE_TASK.toString())) {
+                    if (strings[4].equals(Status.ERROR.toString()))
+                        set.add(Event.valueOf(slitEvent[0]));
+                }
+            } else if (!strings[3].startsWith(Event.SOLVE_TASK.toString()) && !strings[3].startsWith(Event.DONE_TASK.toString())) {
+                if (strings[4].equals(Status.ERROR.toString()))
+                    set.add(Event.valueOf(strings[3]));
+            }
+        }
+        return set;
+    }
+
+    @Override
+    public int getNumberOfAttemptToSolveTask(int task, Date after, Date before) {
+        List<String[]> list = getParseFile(after, before);
+        List<Event> eventList = new LinkedList<>();
+        for (String[] strings : list) {
+            if (strings[3].startsWith(Event.SOLVE_TASK.toString())) {
+                String[] slitEvent = strings[3].split("\\s");
+                if (slitEvent[0].equals(Event.SOLVE_TASK.toString()) && slitEvent[1].equals(String.valueOf(task)))
+                    eventList.add(Event.valueOf(slitEvent[0]));
+            }
+        }
+        return eventList.size();
+    }
+
+    @Override
+    public int getNumberOfSuccessfulAttemptToSolveTask(int task, Date after, Date before) {
+        List<String[]> list = getParseFile(after, before);
+        List<Event> eventList = new LinkedList<>();
+        for (String[] strings : list) {
+            if (strings[3].startsWith(Event.SOLVE_TASK.toString()) && strings[4].equals(Status.OK.toString())) {
+                String[] slitEvent = strings[3].split("\\s");
+                if (slitEvent[0].equals(Event.SOLVE_TASK.toString())) {
+                    if (slitEvent[1].equals(String.valueOf(task)))
+                        eventList.add(Event.valueOf(slitEvent[0]));
+                }
+            }
+        }
+        return eventList.size();
+    }
+
+    @Override
+    public Map<Integer, Integer> getAllSolvedTasksAndTheirNumber(Date after, Date before) {
+        List<String[]> list = getParseFile(after, before);
+        Map<Integer, Integer> map = new LinkedHashMap<>();
+        for (String[] strings : list) {
+            if (strings[3].startsWith(Event.SOLVE_TASK.toString())) {
+                String[] slitEvent = strings[3].split("\\s");
+                if (slitEvent[0].equals(Event.SOLVE_TASK.toString())) {
+                    if (!map.containsKey(Integer.valueOf(slitEvent[1]))) {
+                        map.put(Integer.valueOf(slitEvent[1]), 1);
+                    } else {
+                        map.put(Integer.valueOf(slitEvent[1]), map.get(Integer.valueOf(slitEvent[1])) + 1);
+                    }
+                }
+            }
+        }
+        return map;
+    }
+
+    @Override
+    public Map<Integer, Integer> getAllDoneTasksAndTheirNumber(Date after, Date before) {
+        List<String[]> list = getParseFile(after, before);
+        Map<Integer, Integer> map = new LinkedHashMap<>();
+        for (String[] strings : list) {
+            if (strings[3].startsWith(Event.DONE_TASK.toString())) {
+                String[] slitEvent = strings[3].split("\\s");
+                if (slitEvent[0].equals(Event.DONE_TASK.toString())) {
+                    if (!map.containsKey(Integer.valueOf(slitEvent[1]))) {
+                        map.put(Integer.valueOf(slitEvent[1]), 1);
+                    } else {
+                        map.put(Integer.valueOf(slitEvent[1]), map.get(Integer.valueOf(slitEvent[1])) + 1);
+                    }
+                }
+            }
+        }
+        return map;
     }
 }
