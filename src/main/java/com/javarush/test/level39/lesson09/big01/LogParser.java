@@ -1,5 +1,6 @@
 package com.javarush.test.level39.lesson09.big01;
 
+import com.javarush.test.level39.lesson09.big01.query.DateQuery;
 import com.javarush.test.level39.lesson09.big01.query.IPQuery;
 import com.javarush.test.level39.lesson09.big01.query.UserQuery;
 
@@ -8,10 +9,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Path;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class LogParser implements IPQuery, UserQuery {
+public class LogParser implements IPQuery, UserQuery, DateQuery {
     private Path logDir;
 
     public LogParser(Path logDir) {
@@ -217,6 +219,175 @@ public class LogParser implements IPQuery, UserQuery {
                         } else set.add(strings[1]);
                     }
                 } else set.add(strings[1]);
+            }
+        }
+        return set;
+    }
+
+    @Override
+    public Set<Date> getDatesForUserAndEvent(String user, Event event, Date after, Date before) {
+        return getSetDatasForDiffParams(user, 0, event, null, after, before);
+    }
+
+    @Override
+    public Set<Date> getDatesWhenSomethingFailed(Date after, Date before) {
+        return getSetDatasForDiffParams(null, 0, null, Status.FAILED, after, before);
+    }
+
+    @Override
+    public Set<Date> getDatesWhenErrorHappened(Date after, Date before) {
+        return getSetDatasForDiffParams(null, 0, null, Status.ERROR, after, before);
+    }
+
+    @Override
+    public Date getDateWhenUserLoggedFirstTime(String user, Date after, Date before) {
+        Set<Date> sortedSet = new TreeSet<>(getSetDatasForDiffParams(user, 0, Event.LOGIN, null, after, before));
+        if (sortedSet.size() > 0)
+            return new ArrayList<>(sortedSet).get(0);
+        return null;
+    }
+
+    @Override
+    public Date getDateWhenUserSolvedTask(String user, int task, Date after, Date before) {
+        Set<Date> sortedSet = new TreeSet<>(getSetDatasForDiffParams(user, task, Event.SOLVE_TASK, null, after, before));
+        if (sortedSet.size() > 0)
+            return new ArrayList<>(sortedSet).get(0);
+        return null;
+    }
+
+    @Override
+    public Date getDateWhenUserDoneTask(String user, int task, Date after, Date before) {
+        Set<Date> sortedSet = new TreeSet<>(getSetDatasForDiffParams(user, task, Event.DONE_TASK, null, after, before));
+        if (sortedSet.size() > 0)
+            return new ArrayList<>(sortedSet).get(0);
+        return null;
+    }
+
+    @Override
+    public Set<Date> getDatesWhenUserWroteMessage(String user, Date after, Date before) {
+        return getSetDatasForDiffParams(user, 0, Event.WRITE_MESSAGE, null, after, before);
+    }
+
+    @Override
+    public Set<Date> getDatesWhenUserDownloadedPlugin(String user, Date after, Date before) {
+        return getSetDatasForDiffParams(user, 0, Event.DOWNLOAD_PLUGIN, null, after, before);
+    }
+
+    private Set<Date> getSetDatasForDiffParams(String user, int task, Event event, Status status, Date after, Date before) {
+        List<String[]> list = getParseFile(after, before);
+        Set<Date> set = new LinkedHashSet<>();
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        for (String[] strings : list) {
+            if (strings[3].startsWith(Event.SOLVE_TASK.toString()) || strings[3].startsWith(Event.DONE_TASK.toString())) {
+                String[] slitEvent = strings[3].split("\\s");
+                try {
+                    if (user != null) {
+                        if (strings[1].equals(user)) {
+                            if (task > 0) {
+                                if (slitEvent[1].equals(String.valueOf(task))) {
+                                    if (event != null) {
+                                        if (slitEvent[0].equals(event.toString())) {
+                                            if (status != null) {
+                                                if (strings[4].equals(status.toString()))
+                                                    set.add(df.parse(strings[2]));
+                                            } else set.add(df.parse(strings[2]));
+                                        }
+                                    } else {
+                                        if (status != null) {
+                                            if (strings[4].equals(status.toString()))
+                                                set.add(df.parse(strings[2]));
+                                        } else set.add(df.parse(strings[2]));
+                                    }
+                                }
+                            } else {
+                                if (event != null) {
+                                    if (slitEvent[0].equals(event.toString())) {
+                                        if (status != null) {
+                                            if (strings[4].equals(status.toString()))
+                                                set.add(df.parse(strings[2]));
+                                        } else set.add(df.parse(strings[2]));
+                                    }
+                                } else {
+                                    if (status != null) {
+                                        if (strings[4].equals(status.toString()))
+                                            set.add(df.parse(strings[2]));
+                                    } else set.add(df.parse(strings[2]));
+                                }
+                            }
+                        }
+                    } else {
+                        if (task > 0) {
+                            if (slitEvent[1].equals(String.valueOf(task))) {
+                                if (event != null) {
+                                    if (slitEvent[0].equals(event.toString())) {
+                                        if (status != null) {
+                                            if (strings[4].equals(status.toString()))
+                                                set.add(df.parse(strings[2]));
+                                        } else set.add(df.parse(strings[2]));
+                                    }
+                                } else {
+                                    if (status != null) {
+                                        if (strings[4].equals(status.toString()))
+                                            set.add(df.parse(strings[2]));
+                                    } else set.add(df.parse(strings[2]));
+                                }
+                            }
+                        } else {
+                            if (event != null) {
+                                if (slitEvent[0].equals(event.toString())) {
+                                    if (status != null) {
+                                        if (strings[4].equals(status.toString()))
+                                            set.add(df.parse(strings[2]));
+                                    } else set.add(df.parse(strings[2]));
+                                }
+                            } else {
+                                if (status != null) {
+                                    if (strings[4].equals(status.toString()))
+                                        set.add(df.parse(strings[2]));
+                                } else set.add(df.parse(strings[2]));
+                            }
+                        }
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            } else if (!strings[3].startsWith(Event.SOLVE_TASK.toString()) && !strings[3].startsWith(Event.DONE_TASK.toString())) {
+                String[] slitEvent = strings[3].split("\\s");
+                try {
+                    if (user != null) {
+                        if (strings[1].equals(user)) {
+                            if (event != null) {
+                                if (slitEvent[0].equals(event.toString())) {
+                                    if (status != null) {
+                                        if (strings[4].equals(status.toString()))
+                                            set.add(df.parse(strings[2]));
+                                    } else set.add(df.parse(strings[2]));
+                                }
+                            } else {
+                                if (status != null) {
+                                    if (strings[4].equals(status.toString()))
+                                        set.add(df.parse(strings[2]));
+                                } else set.add(df.parse(strings[2]));
+                            }
+                        }
+                    } else {
+                        if (event != null) {
+                            if (slitEvent[0].equals(event.toString())) {
+                                if (status != null) {
+                                    if (strings[4].equals(status.toString()))
+                                        set.add(df.parse(strings[2]));
+                                } else set.add(df.parse(strings[2]));
+                            }
+                        } else {
+                            if (status != null) {
+                                if (strings[4].equals(status.toString()))
+                                    set.add(df.parse(strings[2]));
+                            } else set.add(df.parse(strings[2]));
+                        }
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return set;
