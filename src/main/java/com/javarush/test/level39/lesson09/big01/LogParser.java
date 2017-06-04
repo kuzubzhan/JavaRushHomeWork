@@ -1,9 +1,6 @@
 package com.javarush.test.level39.lesson09.big01;
 
-import com.javarush.test.level39.lesson09.big01.query.DateQuery;
-import com.javarush.test.level39.lesson09.big01.query.EventQuery;
-import com.javarush.test.level39.lesson09.big01.query.IPQuery;
-import com.javarush.test.level39.lesson09.big01.query.UserQuery;
+import com.javarush.test.level39.lesson09.big01.query.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,7 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
+public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery, QLQuery {
     private Path logDir;
 
     public LogParser(Path logDir) {
@@ -117,12 +114,12 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
 
     @Override
     public Set<String> getAllUsers() {
-        return getSetUsersByEventOrTask(null, null, null, null, 0);
+        return getSetUsersForDiffParams(null, null, null, null, 0);
     }
 
     @Override
     public int getNumberOfUsers(Date after, Date before) {
-        return getSetUsersByEventOrTask(null, null, after, before, 0).size();
+        return getSetUsersForDiffParams(null, null, after, before, 0).size();
     }
 
     @Override
@@ -155,40 +152,40 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
 
     @Override
     public Set<String> getLoggedUsers(Date after, Date before) {
-        return getSetUsersByEventOrTask(Event.LOGIN, null, after, before, 0);
+        return getSetUsersForDiffParams(Event.LOGIN, null, after, before, 0);
     }
 
     @Override
     public Set<String> getDownloadedPluginUsers(Date after, Date before) {
-        return getSetUsersByEventOrTask(Event.DOWNLOAD_PLUGIN, null, after, before, 0);
+        return getSetUsersForDiffParams(Event.DOWNLOAD_PLUGIN, null, after, before, 0);
     }
 
     @Override
     public Set<String> getWroteMessageUsers(Date after, Date before) {
-        return getSetUsersByEventOrTask(Event.WRITE_MESSAGE, null, after, before, 0);
+        return getSetUsersForDiffParams(Event.WRITE_MESSAGE, null, after, before, 0);
     }
 
     @Override
     public Set<String> getSolvedTaskUsers(Date after, Date before) {
-        return getSetUsersByEventOrTask(Event.SOLVE_TASK, null, after, before, 0);
+        return getSetUsersForDiffParams(Event.SOLVE_TASK, null, after, before, 0);
     }
 
     @Override
     public Set<String> getSolvedTaskUsers(Date after, Date before, int task) {
-        return getSetUsersByEventOrTask(Event.SOLVE_TASK, null, after, before, task);
+        return getSetUsersForDiffParams(Event.SOLVE_TASK, null, after, before, task);
     }
 
     @Override
     public Set<String> getDoneTaskUsers(Date after, Date before) {
-        return getSetUsersByEventOrTask(Event.DONE_TASK, null, after, before, 0);
+        return getSetUsersForDiffParams(Event.DONE_TASK, null, after, before, 0);
     }
 
     @Override
     public Set<String> getDoneTaskUsers(Date after, Date before, int task) {
-        return getSetUsersByEventOrTask(Event.DONE_TASK, null, after, before, task);
+        return getSetUsersForDiffParams(Event.DONE_TASK, null, after, before, task);
     }
 
-    private Set<String> getSetUsersByEventOrTask(Event event, Status status, Date after, Date before, int task) {
+    private Set<String> getSetUsersForDiffParams(Event event, Status status, Date after, Date before, int task) {
         List<String[]> list = getParseFile(after, before);
         Set<String> set = new LinkedHashSet<>();
         for (String[] strings : list) {
@@ -227,22 +224,22 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
 
     @Override
     public Set<Date> getDatesForUserAndEvent(String user, Event event, Date after, Date before) {
-        return getSetDatasForDiffParams(user, 0, event, null, after, before);
+        return getSetDatesForDiffParams(user, 0, event, null, after, before);
     }
 
     @Override
     public Set<Date> getDatesWhenSomethingFailed(Date after, Date before) {
-        return getSetDatasForDiffParams(null, 0, null, Status.FAILED, after, before);
+        return getSetDatesForDiffParams(null, 0, null, Status.FAILED, after, before);
     }
 
     @Override
     public Set<Date> getDatesWhenErrorHappened(Date after, Date before) {
-        return getSetDatasForDiffParams(null, 0, null, Status.ERROR, after, before);
+        return getSetDatesForDiffParams(null, 0, null, Status.ERROR, after, before);
     }
 
     @Override
     public Date getDateWhenUserLoggedFirstTime(String user, Date after, Date before) {
-        Set<Date> sortedSet = new TreeSet<>(getSetDatasForDiffParams(user, 0, Event.LOGIN, null, after, before));
+        Set<Date> sortedSet = new TreeSet<>(getSetDatesForDiffParams(user, 0, Event.LOGIN, null, after, before));
         if (sortedSet.size() > 0)
             return new ArrayList<>(sortedSet).get(0);
         return null;
@@ -250,7 +247,7 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
 
     @Override
     public Date getDateWhenUserSolvedTask(String user, int task, Date after, Date before) {
-        Set<Date> sortedSet = new TreeSet<>(getSetDatasForDiffParams(user, task, Event.SOLVE_TASK, null, after, before));
+        Set<Date> sortedSet = new TreeSet<>(getSetDatesForDiffParams(user, task, Event.SOLVE_TASK, null, after, before));
         if (sortedSet.size() > 0)
             return new ArrayList<>(sortedSet).get(0);
         return null;
@@ -258,7 +255,7 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
 
     @Override
     public Date getDateWhenUserDoneTask(String user, int task, Date after, Date before) {
-        Set<Date> sortedSet = new TreeSet<>(getSetDatasForDiffParams(user, task, Event.DONE_TASK, null, after, before));
+        Set<Date> sortedSet = new TreeSet<>(getSetDatesForDiffParams(user, task, Event.DONE_TASK, null, after, before));
         if (sortedSet.size() > 0)
             return new ArrayList<>(sortedSet).get(0);
         return null;
@@ -266,15 +263,15 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
 
     @Override
     public Set<Date> getDatesWhenUserWroteMessage(String user, Date after, Date before) {
-        return getSetDatasForDiffParams(user, 0, Event.WRITE_MESSAGE, null, after, before);
+        return getSetDatesForDiffParams(user, 0, Event.WRITE_MESSAGE, null, after, before);
     }
 
     @Override
     public Set<Date> getDatesWhenUserDownloadedPlugin(String user, Date after, Date before) {
-        return getSetDatasForDiffParams(user, 0, Event.DOWNLOAD_PLUGIN, null, after, before);
+        return getSetDatesForDiffParams(user, 0, Event.DOWNLOAD_PLUGIN, null, after, before);
     }
 
-    private Set<Date> getSetDatasForDiffParams(String user, int task, Event event, Status status, Date after, Date before) {
+    private Set<Date> getSetDatesForDiffParams(String user, int task, Event event, Status status, Date after, Date before) {
         List<String[]> list = getParseFile(after, before);
         Set<Date> set = new LinkedHashSet<>();
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -557,5 +554,37 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
             }
         }
         return map;
+    }
+
+    @Override
+    public Set<Object> execute(String query) {
+        Set<Object> set = new LinkedHashSet<>();
+        switch (query) {
+            case "get ip":
+                set.addAll(getUniqueIPs(null, null));
+                return set;
+            case "get user":
+                set.addAll(getAllUsers());
+                return set;
+            case "get date":
+                set.addAll(getSetDatesForDiffParams(null, 0, null, null, null, null));
+                return set;
+            case "get event":
+                set.addAll(getAllEvents(null, null));
+                return set;
+            case "get status":
+                set.addAll(getAllStatus(null, null));
+                return set;
+        }
+        return set;
+    }
+
+    private Set<Status> getAllStatus(Date after, Date before) {
+        List<String[]> list = getParseFile(after, before);
+        Set<Status> set = new LinkedHashSet<>();
+        for (String[] strings : list) {
+            set.add(Status.valueOf(strings[4]));
+        }
+        return set;
     }
 }
