@@ -559,22 +559,35 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery, QLQ
     @Override
     public Set<Object> execute(String query) {
         Set<Object> set = new LinkedHashSet<>();
-        switch (query) {
-            case "get ip":
-                set.addAll(getUniqueIPs(null, null));
-                return set;
-            case "get user":
-                set.addAll(getAllUsers());
-                return set;
-            case "get date":
-                set.addAll(getSetDatesForDiffParams(null, 0, null, null, null, null));
-                return set;
-            case "get event":
-                set.addAll(getAllEvents(null, null));
-                return set;
-            case "get status":
-                set.addAll(getAllStatus(null, null));
-                return set;
+        if (query.matches("[.+^\\s]\\s[.+^\\s]")) {
+            switch (query) {
+                case "get ip":
+                    set.addAll(getUniqueIPs(null, null));
+                    return set;
+                case "get user":
+                    set.addAll(getAllUsers());
+                    return set;
+                case "get date":
+                    set.addAll(getSetDatesForDiffParams(null, 0, null, null, null, null));
+                    return set;
+                case "get event":
+                    set.addAll(getAllEvents(null, null));
+                    return set;
+                case "get status":
+                    set.addAll(getAllStatus(null, null));
+                    return set;
+            }
+        } else if (query.matches(".+\\s=\\s\".+\"")) {
+            String[] splStr = query.split("\"");
+            String[] fields = splStr[0].split("\\s");
+            String field1 = fields[1];
+            String field2 = fields[3];
+            String value1 = splStr[1];
+            List<String[]> list = getParseFile(null, null);
+            for (String[] strings : list) {
+                if (compareObjects(strings, value1, field2))
+                    set.add(getObject(strings, field1));
+            }
         }
         return set;
     }
@@ -586,5 +599,103 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery, QLQ
             set.add(Status.valueOf(strings[4]));
         }
         return set;
+    }
+
+    private int getFieldNumber(String field) {
+        if (field != null) {
+            switch (field) {
+                case "ip":
+                    return 0;
+                case "user":
+                    return 1;
+                case "date":
+                    return 2;
+                case "event":
+                    return 3;
+                case "status":
+                    return 4;
+            }
+        }
+        return -1;
+    }
+
+    private Object getObject(String[] fieldArr, String field) {
+        if (fieldArr != null && field != null) {
+            DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+            String str = fieldArr[getFieldNumber(field)];
+            switch (field) {
+                case "ip":
+                case "user":
+                    return str;
+                case "date":
+                    try {
+                        return df.parse(str);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case "event":
+                    if (!str.matches("SOLVE_TASK\\s\\d+") && !str.matches("DONE_TASK\\s\\d+")) {
+                        if (checkStr(str, field))
+                            return Event.valueOf(str);
+                    } else {
+                        String[] slitEvent = str.split("\\s");
+                        if (slitEvent.length == 2) {
+                            if (checkStr(slitEvent[0], field))
+                                return Event.valueOf(slitEvent[0]);
+                        }
+                    }
+                    break;
+                case "status":
+                    if (checkStr(str, field))
+                        return Status.valueOf(str);
+            }
+        }
+        return null;
+    }
+
+    private boolean compareObjects(String[] fieldArr, String s, String field) {
+        if (fieldArr != null && s != null && field != null) {
+            String str = fieldArr[getFieldNumber(field)];
+            switch (field) {
+                case "ip":
+                case "user":
+                case "date":
+                    return str.equals(s);
+                case "event":
+                    String[] slitEvent = str.split("\\s");
+                    if (slitEvent.length == 2)
+                        return slitEvent[0].equals(s);
+                    return str.equals(s);
+                case "status":
+                    return str.equals(s);
+            }
+        }
+        return false;
+    }
+
+    private boolean checkStr(String o, String cast) {
+        boolean result = false;
+        if (o != null && cast != null) {
+            switch (cast) {
+                case "event":
+                    for (Event event : Event.values()) {
+                        if (event.toString().equals(o)) {
+                            result = true;
+                            break;
+                        }
+                    }
+                    break;
+                case "status":
+                    for (Status status : Status.values()) {
+                        if (status.toString().equals(o)) {
+                            result = true;
+                            break;
+                        }
+                    }
+                    break;
+            }
+        }
+        return result;
     }
 }
