@@ -559,7 +559,7 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery, QLQ
     @Override
     public Set<Object> execute(String query) {
         Set<Object> set = new LinkedHashSet<>();
-        if (query.matches("[.+^\\s]\\s[.+^\\s]")) {
+        if (query.split("\\s").length == 2) {
             switch (query) {
                 case "get ip":
                     set.addAll(getUniqueIPs(null, null));
@@ -577,13 +577,28 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery, QLQ
                     set.addAll(getAllStatus(null, null));
                     return set;
             }
-        } else if (query.matches(".+\\s=\\s\".+\"")) {
+        } else if (query.split("\\s").length > 2) {
             String[] splStr = query.split("\"");
             String[] fields = splStr[0].split("\\s");
             String field1 = fields[1];
             String field2 = fields[3];
             String value1 = splStr[1];
-            List<String[]> list = getParseFile(null, null);
+            List<String[]> list;
+            if (!query.matches(".+and date between.+")) {
+                list = getParseFile(null, null);
+            } else {
+                DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                Date after = null;
+                Date before = null;
+                try {
+                    after = df.parse(splStr[3]);
+                    before = df.parse(splStr[5]);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                list = getParseFile(after, before);
+            }
+
             for (String[] strings : list) {
                 if (compareObjects(strings, value1, field2))
                     set.add(getObject(strings, field1));
