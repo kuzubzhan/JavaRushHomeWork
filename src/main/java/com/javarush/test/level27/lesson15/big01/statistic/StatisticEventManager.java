@@ -13,6 +13,11 @@ import java.util.*;
 public class StatisticEventManager {
     private static StatisticEventManager ourInstance = new StatisticEventManager();
     private StatisticStorage storage = new StatisticStorage();
+
+    public Set<Cook> getCooks() {
+        return cooks;
+    }
+
     private Set<Cook> cooks = new HashSet<>();
 
     public static StatisticEventManager getInstance() {
